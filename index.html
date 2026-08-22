@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Grocery Planner</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+            background: #f9f9f9;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+            min-width: 100px;
+        }
+        
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-btn:hover {
+            color: #667eea;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .filter-section {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .filter-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .add-item-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .add-item-form input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .add-item-form input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        .add-item-form select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .add-item-form button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .add-item-form button:hover {
+            background: #764ba2;
+        }
+        
+        .shopping-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.2s;
+        }
+        
+        .shopping-item:hover {
+            background: #f9f9f9;
+        }
+        
+        .shopping-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-right: 12px;
+            accent-color: #667eea;
+        }
+        
+        .shopping-item label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .shopping-item.checked label {
+            text-decoration: line-through;
+            color: #999;
+        }
+        
+        .shopping-item .delete-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        
+        .shopping-item .delete-btn:hover {
+            background: #ee5a52;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+        }
+        
+        .meal-day {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .meal-day h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        
+        .meal-type {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .meal-type strong {
+            color: #666;
+            display: inline-block;
+            width: 70px;
+        }
+        
+        .meal-type p {
+            display: inline;
+            color: #333;
+        }
+        
+        .recipe-day {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .recipe-day h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .recipe-content {
+            display: none;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .recipe-content.open {
+            display: block;
+        }
+        
+        .recipe-day h3:hover {
+            opacity: 0.7;
+        }
+        
+        .prep-tips-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        
+        .prep-tips-section h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .prep-tips-section p {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 4px;
+            padding-left: 15px;
+        }
+        
+        .stats {
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #667eea;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .add-item-form {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                font-size: 12px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Weekly Grocery Planner</h1>
+            <p>Wheat-free • Family-friendly • Blackstone-ready</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('shopping')">Shopping List</button>
+            <button class="tab-btn" onclick="switchTab('meals')">Meal Plan</button>
+            <button class="tab-btn" onclick="switchTab('recipes')">Recipes</button>
+            <button class="tab-btn" onclick="switchTab('prep')">Prep Tips</button>
+        </div>
+        
+        <div class="content">
+            <div id="shopping" class="tab-content active">
+                <div class="stats" id="stats"></div>
+                
+                <div class="add-item-form">
+                    <input type="text" id="newItemInput" placeholder="Add new item..." />
+                    <select id="sectionSelect">
+                        <option value="Produce">Produce</option>
+                        <option value="Dairy & Cheese">Dairy & Cheese</option>
+                        <option value="Proteins">Proteins</option>
+                        <option value="Pantry (GF)">Pantry (GF)</option>
+                        <option value="Pantry & Condiments">Pantry & Condiments</option>
+                        <option value="Fruit">Fruit</option>
+                    </select>
+                    <button onclick="addItem()">Add</button>
+                </div>
+                
+                <div class="filter-section">
+                    <button class="filter-btn active" onclick="filterSection('all')">All Items</button>
+                    <button class="filter-btn" onclick="filterSection('Produce')">Produce</button>
+                    <button class="filter-btn" onclick="filterSection('Proteins')">Proteins</button>
+                    <button class="filter-btn" onclick="filterSection('Dairy & Cheese')">Dairy</button>
+                    <button class="filter-btn" onclick="filterSection('Pantry (GF)')">Pantry</button>
+                </div>
+                
+                <div id="shoppingList"></div>
+            </div>
+            
+            <div id="meals" class="tab-content">
+                <div id="mealPlanContent"></div>
+            </div>
+            
+            <div id="recipes" class="tab-content">
+                <div id="recipesContent"></div>
+            </div>
+            
+            <div id="prep" class="tab-content">
+                <div id="prepContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const initialData = {
+            "Proteins": [
+                { name: "Chicken thighs, bone-in (3 lbs)", checked: false },
+                { name: "Chicken breast, boneless (1.5 lbs)", checked: false },
+                { name: "Ground beef (3 lbs total - for tacos & pasta)", checked: false },
+                { name: "Sirloin steak (1.5-2 lbs)", checked: false },
+                { name: "Cod fillets (1.5 lbs)", checked: false },
+                { name: "Pork shoulder, bone-in (4-5 lbs)", checked: false },
+                { name: "Eggs (18 count)", checked: false },
+                { name: "Deli turkey", checked: false },
+                { name: "Rotisserie chicken", checked: false }
+            ],
+            "Dairy & Cheese": [
+                { name: "Greek yogurt", checked: false },
+                { name: "Shredded cheddar cheese", checked: false },
+                { name: "Mozzarella cheese", checked: false },
+                { name: "Parmesan cheese (grated)", checked: false },
+                { name: "Milk", checked: false },
+                { name: "Butter", checked: false },
+                { name: "Sour cream", checked: false }
+            ],
+            "Pantry (GF)": [
+                { name: "GF pasta", checked: false },
+                { name: "GF breadcrumbs (or GF bread to make)", checked: false },
+                { name: "GF bread (wheat-free)", checked: false },
+                { name: "Corn tortillas", checked: false },
+                { name: "Hard corn tortilla shells", checked: false },
+                { name: "Siete tortillas (GF)", checked: false },
+                { name: "Long-grain rice", checked: false },
+                { name: "Certified GF oats", checked: false },
+                { name: "GF pancake mix", checked: false },
+                { name: "GF crackers", checked: false },
+                { name: "GF sandwich rolls (12-16)", checked: false }
+            ],
+            "Produce": [
+                { name: "Sweet potatoes (3 lbs)", checked: false },
+                { name: "Green beans (2 lbs)", checked: false },
+                { name: "Cabbage (1 head)", checked: false },
+                { name: "Carrots (2 lbs)", checked: false },
+                { name: "Bell peppers - red, yellow, orange (4-5 total)", checked: false },
+                { name: "Yellow onions (5-6 large)", checked: false },
+                { name: "Potatoes (2 lbs)", checked: false },
+                { name: "Avocados (3-4)", checked: false },
+                { name: "Tomatoes (2-3)", checked: false },
+                { name: "Lettuce/spinach", checked: false },
+                { name: "Asparagus (1.5 lbs)", checked: false },
+                { name: "Green onions/scallions (2 bunches)", checked: false },
+                { name: "Fresh garlic (1 head)", checked: false },
+                { name: "Fresh ginger (small piece or ground)", checked: false },
+                { name: "Fresh cilantro (optional)", checked: false },
+                { name: "Limes (4-5)", checked: false }
+            ],
+            "Fruit": [
+                { name: "Berries (mixed - fresh or frozen)", checked: false },
+                { name: "Bananas (6-8)", checked: false },
+                { name: "Apples (4-5)", checked: false }
+            ],
+            "Pantry & Condiments": [
+                { name: "Olive oil", checked: false },
+                { name: "Marinara sauce/tomato sauce (wheat-free, 24 oz)", checked: false },
+                { name: "Tamari/soy sauce (wheat-free)", checked: false },
+                { name: "Apple cider vinegar", checked: false },
+                { name: "Worcestershire sauce (wheat-free if available)", checked: false },
+                { name: "Honey or brown sugar", checked: false },
+                { name: "Brown sugar (1/4 cup needed)", checked: false },
+                { name: "Chicken or vegetable broth (1 cup needed)", checked: false },
+                { name: "BBQ sauce (wheat-free, optional)", checked: false },
+                { name: "Spices: cumin, smoked paprika, paprika, Italian seasoning, garlic powder, onion powder, cayenne", checked: false },
+                { name: "Salt & black pepper", checked: false },
+                { name: "Taco seasoning (GF)", checked: false }
+            ]
+        };
+        
+        let shoppingData = JSON.parse(localStorage.getItem('shoppingData')) || initialData;
+        let currentFilter = 'all';
+        
+        const mealPlanData = {
+            Monday: { breakfast: "Eggs & toast (GF bread)", lunch: "Leftover taco filling with rice & lettuce wraps", dinner: "Taco night: ground beef, corn tortillas, toppings" },
+            Tuesday: { breakfast: "Oatmeal (certified GF) with berries & maple syrup", lunch: "Leftover rotisserie chicken, rice, veggies", dinner: "Sheet pan chicken thighs with roasted sweet potatoes & green beans" },
+            Wednesday: { breakfast: "Yogurt with granola & berries", lunch: "Turkey & cheese sandwiches (GF bread), fruit", dinner: "Chicken stir-fry with asparagus, green onion, and rice" },
+            Thursday: { breakfast: "Smoothies (banana, berries, yogurt, milk)", lunch: "Leftover stir-fry or soup, GF crackers", dinner: "Pasta night: GF pasta, homemade marinara, meatballs" },
+            Friday: { breakfast: "Scrambled eggs, fruit, toast", lunch: "Leftover pasta or soup, GF crackers", dinner: "Blackstone steak fajitas: marinated steak, peppers, onions, tortillas" },
+            Saturday: { breakfast: "Pancakes (GF mix) with berries & butter", lunch: "Picnic: cheese, deli meat, fruit, GF crackers", dinner: "Fish tacos: baked cod, avocado, cabbage slaw, lime" },
+            Sunday: { breakfast: "Breakfast bake (eggs, veggies, cheese)", lunch: "Leftovers from breakfast bake, salad", dinner: "Slow cooker pulled pork, coleslaw, GF rolls" }
+        };
+        
+        const recipes = {
+            Monday: { 
+                name: "Taco Night (Blackstone or Stovetop)", 
+                time: "20 min", 
+                servings: "4-6 people",
+                ingredients: "1.5 lbs ground beef (85/15), 2 tbsp taco seasoning (GF), 1/2 cup water, 12-16 corn tortillas, toppings: shredded cheddar, lettuce, diced tomato, diced onion, sour cream, salsa",
+                instructions: "<strong>Prep (5 min):</strong><br>• Dice onions, tomatoes, and shred lettuce if not pre-done<br>• Have toppings in separate bowls<br><br><strong>Cook the meat (10 min):</strong><br>• Heat a large skillet to medium-high (375°F if using Blackstone)<br>• Add ground beef, breaking it apart with a wooden spoon<br>• Brown for 5-6 minutes, breaking into small pieces, until no pink remains<br>• Drain excess fat if needed (leave some for flavor)<br>• Add taco seasoning and 1/2 cup water<br>• Stir well and simmer for 2-3 minutes until sauce thickens slightly<br><br><strong>Warm tortillas:</strong><br>• Place tortillas directly on skillet/Blackstone for 20-30 seconds per side until warm and slightly charred<br>• Stack in a clean kitchen towel to keep warm<br><br><strong>Assemble & Serve:</strong><br>• Let everyone build their own tacos<br>• Meat first, then toppings in order: cheese, lettuce, tomato, onion, sour cream, salsa<br><br><strong>Pro tips:</strong><br>• Use 85/15 ground beef for better flavor and less grease<br>• Don't overcook meat—it toughens with long cooking<br>• Char tortillas slightly for better texture and flavor"
+            },
+            Tuesday: { 
+                name: "Sheet Pan Chicken with Sweet Potatoes & Green Beans", 
+                time: "50 min (20 min prep, 30 min bake)", 
+                servings: "4-6 people",
+                ingredients: "1.5 lbs bone-in, skin-on chicken thighs (6-8 pieces), 3 medium sweet potatoes (about 1.5 lbs), 1 lb fresh green beans (trimmed), 4 tbsp olive oil, 2 tsp garlic powder, 2 tsp paprika, 1 tsp cumin, 1 tsp salt, 1/2 tsp black pepper, 1 lemon (optional)",
+                instructions: "<strong>Prep (20 min):</strong><br>• Preheat oven to 400°F<br>• Pat chicken thighs dry with paper towels (removes moisture so skin crisps)<br>• Cut sweet potatoes into 1-inch cubes (no need to peel)<br>• Trim green beans and toss in a bowl<br>• Line a large sheet pan (18x13 inches) with parchment paper or foil<br><br><strong>Arrange & Season (10 min):</strong><br>• Spread sweet potato cubes on sheet pan<br>• Drizzle with 2 tbsp olive oil, season with half the spices<br>• Toss to coat evenly<br>• Roast potatoes alone for 10 minutes<br><br><strong>Add remaining ingredients (5 min):</strong><br>• Remove pan from oven<br>• Push potatoes to the sides, arrange chicken thighs skin-side up in center<br>• Drizzle chicken with 1 tbsp olive oil<br>• Season chicken with remaining spices<br>• Toss green beans with 1 tbsp olive oil and salt/pepper<br>• Spread green beans around the pan<br><br><strong>Roast (20-25 min):</strong><br>• Return to 400°F oven<br>• Roast until chicken reaches 165°F (use meat thermometer in thickest part)<br>• Green beans should be tender-crisp, potatoes should be golden and fork-tender<br>• Chicken skin should be crispy and browned<br><br><strong>Serve:</strong><br>• Squeeze fresh lemon over everything if desired<br>• Let rest 2 minutes before serving<br><br><strong>Pro tips:</strong><br>• Don't skip patting chicken dry—wet skin won't crisp<br>• Bone-in thighs stay juicier than breasts<br>• Cut potatoes into uniform sizes for even cooking<br>• One pan = minimal cleanup!"
+            },
+            Wednesday: { 
+                name: "Chicken Stir-Fry with Asparagus & Green Onion", 
+                time: "25 min (10 min prep, 15 min cook)", 
+                servings: "4 people",
+                ingredients: "1.5 lbs boneless, skinless chicken breast, 1 large bunch fresh asparagus (1.5 lbs), 6-8 green onions/scallions, 4 cloves garlic (minced), 3 tbsp tamari (wheat-free soy sauce), 1 tbsp honey or brown sugar, 2 tbsp olive oil (divided), 1 tbsp cornstarch, 1/4 cup chicken broth, 1/2 tsp ginger (fresh or ground), salt and pepper to taste, 2 cups cooked rice for serving",
+                instructions: "<strong>Prep the chicken (5 min):</strong><br>• Slice chicken breasts horizontally into thin strips (about 1/4-inch thick)<br>• This helps it cook faster and more evenly<br>• In a small bowl, toss chicken with 1 tbsp cornstarch, salt, and pepper<br>• The cornstarch creates a light coating for texture<br><br><strong>Prep vegetables (5 min):</strong><br>• Wash asparagus and snap off woody ends (bend until they naturally break)<br>• Cut into 1.5-inch pieces<br>• Clean green onions and cut into 2-inch pieces (separate white and green parts)<br>• Mince garlic<br><br><strong>Make sauce (2 min):</strong><br>• In a small bowl, whisk together: 3 tbsp tamari, 1 tbsp honey, 1/4 cup broth, 1/2 tsp ginger<br>• Set aside<br><br><strong>Cook chicken (6-7 min):</strong><br>• Heat 1 tbsp olive oil in a large skillet or wok over medium-high heat (375-400°F)<br>• Wait until oil is shimmering (hot but not smoking)<br>• Add chicken in a single layer (may need to do in batches—don't crowd the pan)<br>• Let cook undisturbed for 3-4 minutes to get a light brown surface<br>• Stir and cook another 2-3 minutes until internal temp reaches 165°F<br>• Transfer to a clean plate<br><br><strong>Cook vegetables (4-5 min):</strong><br>• Add remaining 1 tbsp oil to same skillet<br>• Add white parts of green onions and asparagus<br>• Stir-fry for 3-4 minutes until asparagus is bright green and tender-crisp<br>• Add minced garlic and stir for 30 seconds until fragrant<br><br><strong>Combine & finish (2 min):</strong><br>• Return cooked chicken to skillet<br>• Pour in sauce and stir everything together<br>• Add green parts of onions<br>• Toss for 1-2 minutes until sauce coats everything and heats through<br><br><strong>Serve:</strong><br>• Serve immediately over 2 cups cooked rice<br>• The sauce should coat everything lightly<br><br><strong>Pro tips:</strong><br>• Don't skip the cornstarch—it gives great texture<br>• High heat + quick cooking = tender, crispy vegetables<br>• Tamari is naturally wheat-free soy sauce (most regular soy has wheat)<br>• Prep everything before cooking starts—stir-frying is fast!<br>• If sauce seems too thick, add 2 tbsp more broth"
+            },
+            Thursday: { 
+                name: "GF Pasta with Marinara & Meatballs", 
+                time: "35 min (10 min prep, 25 min cook)", 
+                servings: "4-6 people",
+                ingredients: "1 lb ground beef (85/15), 1/2 cup GF breadcrumbs (Barilla or homemade), 1 large egg, 1/4 cup grated parmesan cheese, 3 cloves garlic (minced), 1 tsp Italian seasoning, 1/2 tsp salt, 1/4 tsp black pepper, 1 tbsp olive oil, 24 oz marinara sauce (GF, like Barilla or Victoria), 12 oz GF pasta (Barilla or Banza work well), 2 quarts water for pasta, 1 tbsp salt for pasta water, fresh basil (optional), extra parmesan for serving",
+                instructions: "<strong>Make meatballs (10 min prep, 12-15 min cook):</strong><br>• Bring a pot of salted water to boil for pasta (you'll use this later)<br>• In a large bowl, combine: 1 lb ground beef, 1/2 cup GF breadcrumbs, 1 egg, 1/4 cup parmesan, 3 cloves minced garlic, 1 tsp Italian seasoning, 1/2 tsp salt, 1/4 tsp pepper<br>• Mix gently with your hands—don't overmix or they'll be tough<br>• Roll into 16-20 balls about 1.5 inches in diameter (use a 1-tbsp ice cream scoop for uniform size)<br><br><strong>Brown meatballs (8-10 min):</strong><br>• Heat 1 tbsp olive oil in a large skillet over medium-high heat<br>• Working in batches, add meatballs without crowding<br>• Don't move them for 3-4 minutes—let them brown on the bottom<br>• Roll them around to brown all sides (total 8-10 minutes)<br>• They don't need to be fully cooked inside—the sauce will finish them<br>• Transfer to a plate<br><br><strong>Make sauce (12-15 min):</strong><br>• In the same skillet, pour in 24 oz marinara sauce<br>• Return meatballs to sauce<br>• Bring to a gentle simmer<br>• Cook 10-15 minutes so flavors blend and meatballs finish cooking (internal temp 160°F)<br>• Stir occasionally to prevent sticking<br>• Sauce is ready when meatballs are cooked through and sauce thickens slightly<br><br><strong>Cook pasta (timing varies):</strong><br>• By now, your water should be boiling<br>• Add 1 tbsp salt to water, then pasta<br>• Cook according to GF pasta box directions (usually 8-12 minutes)<br>• GF pasta is more delicate—stir often so it doesn't stick<br>• Test at 1 minute before the box time<br>• You want it al dente (tender but still with slight firmness)<br><br><strong>Drain & assemble:</strong><br>• Drain pasta in a colander (don't rinse)<br>• Divide pasta among bowls<br>• Top with meatballs and marinara sauce<br>• Sprinkle with extra parmesan<br>• Add fresh basil if you have it<br><br><strong>Pro tips:</strong><br>• GF pasta breaks easier than regular—stir gently<br>• Don't overmix meatballs or they become dense<br>• Brown meatballs in batches for better browning (don't overcrowd)<br>• Barilla GF pasta is reliable and tastes good<br>• Meatballs in sauce stay juicy because sauce adds moisture<br>• Make double batch of meatballs on Sunday for easy lunches"
+            },
+            Friday: { 
+                name: "Blackstone Steak Fajitas (No Sesame)", 
+                time: "35 min (15 min prep, 15 min marinade, 5 min cook)", 
+                servings: "4-6 people",
+                ingredients: "1.5-2 lbs sirloin steak (or flank steak), 3 large bell peppers (mixed colors: red, yellow, orange—avoid green for better sweetness), 2 large yellow onions, 6 tbsp olive oil (divided), 4 cloves garlic (minced), 3 tbsp fresh lime juice (about 2 limes), 2 tsp ground cumin, 2 tsp smoked paprika, 1 tsp salt, 1/2 tsp black pepper, 1/4 tsp cayenne (optional), 12-16 flour tortillas (or Siete brand GF tortillas), toppings: shredded cheddar, sour cream, guacamole, salsa, cilantro, lime wedges",
+                instructions: "<strong>Prep the steak (10 min):</strong><br>• Pat steak dry with paper towels (removes surface moisture)<br>• Slice against the grain into 1/4-inch strips (easier to do when partially frozen—freeze 20 min first)<br>• If steak is too thick, place between plastic wrap and pound with mallet to 1/2-inch thick<br><br><strong>Make marinade (3 min):</strong><br>• In a large bowl, whisk: 3 tbsp olive oil, 3 tbsp lime juice, 4 cloves minced garlic, 2 tsp cumin, 2 tsp paprika, 1 tsp salt, 1/2 tsp pepper, 1/4 tsp cayenne<br><br><strong>Marinate steak (15 min):</strong><br>• Add steak strips to marinade<br>• Toss to coat evenly<br>• Let sit 15 minutes at room temperature (or up to 2 hours in fridge)<br>• Don't marinate longer than 2 hours or steak gets mushy<br><br><strong>Prep vegetables (10 min):</strong><br>• Core bell peppers and remove seeds<br>• Slice into 1/2-inch thick strips (about 1/4 inch wide)<br>• Peel onions and slice into 1/2-inch thick rings<br>• Keep peppers and onions separate for now<br><br><strong>Preheat Blackstone (5 min):</strong><br>• Heat to medium-high (375-400°F)<br>• You want it hot enough that water droplets sizzle immediately<br><br><strong>Cook vegetables (5-7 min):</strong><br>• Drizzle 1.5 tbsp olive oil across the Blackstone<br>• Add onion rings and spread out<br>• Cook 3-4 minutes without moving—you want some caramelization (light browning)<br>• Stir and cook another 2 minutes until edges are brown and onions are tender-crisp<br>• Move vegetables to the side of the griddle<br><br><strong>Cook steak (4-5 min):</strong><br>• Drizzle 1.5 tbsp olive oil on empty space of Blackstone<br>• Add marinated steak strips in a single layer<br>• Let cook 2-3 minutes without stirring (builds a brown crust)<br>• Stir and cook another 1-2 minutes until steak reaches 140°F (medium-rare)<br>• Don't overcook—sliced steak cooks fast<br><br><strong>Combine (1 min):</strong><br>• Push steak toward vegetables<br>• Toss together for 30 seconds so flavors combine<br>• Everything should be hot and lightly charred<br><br><strong>Warm tortillas (2 min):</strong><br>• Clear a section of Blackstone<br>• Warm tortillas directly on griddle, 20-30 seconds per side<br>• Stack in a clean towel to keep warm<br><br><strong>Serve:</strong><br>• Set out steak and vegetable mixture on a serving platter<br>• Arrange toppings in bowls<br>• Let everyone build their own: tortilla, steak-veggie mix, toppings<br><br><strong>Pro tips:</strong><br>• Use sirloin or flank steak—ribeye/NY strip are too thick and cook unevenly on Blackstone<br>• Slice against the grain for tenderness<br>• Bell peppers sweet when cooked—avoid green for better flavor<br>• Don't use sesame oil (wheat concern) or sesame seeds<br>• Keep heat consistent—too hot and outsides char before insides cook<br>• Cook in batches if needed to avoid crowding<br>• Lime juice is key—don't skip it"
+            },
+            Saturday: { 
+                name: "Fish Tacos with Lime Slaw", 
+                time: "30 min (15 min prep, 15 min cook)", 
+                servings: "4 people",
+                ingredients: "1.5 lbs cod or mahi-mahi fillets (or other mild white fish), 1 small head green cabbage (about 3 cups shredded), 3 limes (divided: 2 for slaw, 1 for fish), 4 tbsp olive oil (divided), 1 tsp smoked paprika, 1 tsp ground cumin, 1/2 tsp salt, 1/4 tsp black pepper, 1/4 tsp cayenne (optional), 8-12 corn tortillas, toppings: diced avocado, fresh cilantro, diced red onion, lime crema (sour cream mixed with lime juice), salsa",
+                instructions: "<strong>Make lime slaw (10 min):</strong><br>• Remove outer leaves of cabbage and discard<br>• Cut cabbage in half, then slice thinly (1/8-inch) into long ribbons<br>• You should have about 3 cups shredded cabbage<br>• Juice 2 limes into a bowl (you need about 3 tbsp juice)<br>• Whisk together: lime juice, 2 tbsp olive oil, 1/4 tsp salt, pinch of pepper<br>• Toss cabbage with dressing<br>• Let sit while you cook fish (it softens and wilts slightly)<br>• Taste and adjust salt/lime as needed<br><br><strong>Prep fish (5 min):</strong><br>• Pat fish fillets dry with paper towels (removes surface moisture)<br>• If fillets are very thick (over 1 inch), cut into 4-6 portions<br>• Fillets should be about 1/2-inch thick for even cooking<br>• In a small bowl, mix: 1 tsp paprika, 1 tsp cumin, 1/2 tsp salt, 1/4 tsp pepper, 1/4 tsp cayenne<br>• Season both sides of fish with spice mixture<br><br><strong>Cook fish (8-10 min):</strong><br>• Heat 2 tbsp olive oil in a large skillet over medium-high heat (about 375°F)<br>• Wait until oil is shimmering<br>• Add fish fillets in a single layer (don't crowd—cook in batches if needed)<br>• Cook 4-5 minutes on first side without moving—look for golden-brown exterior<br>• Gently flip (fish is delicate—use two spatulas if needed)<br>• Cook another 3-4 minutes on second side until fish is opaque and flakes easily with a fork<br>• Fish is done when internal temp reaches 145°F<br><br><strong>Warm tortillas (2 min):</strong><br>• Heat tortillas in a dry skillet over medium heat, about 30 seconds per side<br>• They should be warm and pliable<br>• Alternatively, char them over a gas flame for 15 seconds per side for smoky flavor<br>• Stack in a clean towel<br><br><strong>Assemble tacos:</strong><br>• Warm tortilla + piece of fish + generous spoonful of slaw on top<br>• Add avocado, cilantro, red onion<br>• Drizzle with lime crema (sour cream whisked with lime juice)<br>• Squeeze fresh lime over everything<br><br><strong>Pro tips:</strong><br>• Cod is mild and forgiving—great for kids<br>• Mahi-mahi is slightly firmer and sweeter<br>• Don't overcook fish—it dries out fast (145°F is the sweet spot)<br>• Cabbage slaw should be crunchy—don't make it hours ahead<br>• Fresh lime juice is essential—bottled won't taste the same<br>• Make lime crema by mixing 1/2 cup sour cream with 2 tbsp lime juice<br>• This is a light, healthy dinner"
+            },
+            Sunday: { 
+                name: "Slow Cooker Pulled Pork", 
+                time: "10 min active, 6-8 hours slow cook (or 3-4 hours on HIGH)", 
+                servings: "8-10 people",
+                ingredients: "1 pork shoulder (4-5 lbs, bone-in or boneless), 2 large yellow onions (1 whole, 1 halved), 1/2 cup apple cider vinegar, 1/4 cup packed brown sugar, 3 tbsp Worcestershire sauce (wheat-free if needed), 2 tbsp smoked paprika, 1 tbsp garlic powder, 1 tbsp onion powder, 1 tbsp salt, 1 tsp black pepper, 1 tsp cayenne (optional), 1 cup chicken or vegetable broth, 12-16 GF sandwich rolls, coleslaw (for serving), BBQ sauce (optional, for finishing)",
+                instructions: "<strong>Prep the pork (10 min):</strong><br>• Pat pork dry with paper towels<br>• If skin is very thick, score it lightly with a knife (helps seasoning penetrate)<br>• In a small bowl, combine dry spices: 2 tbsp paprika, 1 tbsp garlic powder, 1 tbsp onion powder, 1 tbsp salt, 1 tsp pepper, 1 tsp cayenne<br>• Rub spice mixture all over the pork, getting into crevices<br>• Don't be shy—this creates the flavor layer<br><br><strong>Prep slow cooker (5 min):</strong><br>• Peel onions and halve one of them<br>• Place onion halves and 1 whole onion on the bottom of slow cooker<br>• These act as a rack to keep pork off the bottom (so it doesn't stick)<br><br><strong>Make braising liquid (3 min):</strong><br>• In a bowl, whisk: 1/2 cup apple cider vinegar, 1/4 cup brown sugar, 3 tbsp Worcestershire, 1 cup broth<br>• Stir until sugar dissolves<br><br><strong>Add pork to slow cooker:</strong><br>• Place seasoned pork on top of onions, fat-side up if possible<br>• Pour braising liquid over and around pork (should not fully submerge)<br>• Put lid on slow cooker<br><br><strong>Cook LOW (6-8 hours) OR HIGH (3-4 hours):</strong><br>• LOW is better for texture (meat is more tender)<br>• HIGH is faster if you need it ready sooner<br>• After 4-5 hours on LOW, pork should begin to shred when poked with fork<br>• After 6+ hours, it will shred easily with just a fork<br>• Meat is done when it reaches 190°F (a meat thermometer makes this easy)<br><br><strong>Shred the pork (10 min when done):</strong><br>• Carefully remove pork from slow cooker to a large cutting board<br>• Let rest 5 minutes (easier to handle)<br>• Using two forks, pull/shred the meat into bite-sized pieces<br>• Discard bones and any large fatty pieces<br>• Return shredded pork to the cooking liquid in slow cooker<br>• Stir together so pork absorbs all the flavors<br>• Let sit 10 minutes<br><br><strong>Optional finishing step:</strong><br>• If you like it saucier, add 1/2 cup BBQ sauce (wheat-free) and stir to coat<br>• Taste and adjust seasonings (add more vinegar for tang, brown sugar for sweetness)<br><br><strong>Serve:</strong><br>• Toast GF rolls if desired (gives them better texture)<br>• Place large spoonful of pulled pork on each roll<br>• Top with coleslaw<br>• Serve extra sauce on the side<br><br><strong>Pro tips:</strong><br>• Pork shoulder is forgiving—hard to overcook<br>• Bone-in pork has better flavor than boneless<br>• Liquid should be about 1 inch deep—not too much or meat gets mushy<br>• Save leftover braising liquid—great for sandwiches or freezing<br>• Pulled pork reheats beautifully—makes great lunches<br>• Make it on Sunday, use all week for easy protein<br>• Can be made a day ahead and reheated gently<br>• Freezes well for up to 3 months"
+            }
+        };
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'meals') renderMealPlan();
+            if (tabName === 'recipes') renderRecipes();
+            if (tabName === 'prep') renderPrepTips();
+        }
+        
+        function addItem() {
+            const input = document.getElementById('newItemInput');
+            const section = document.getElementById('sectionSelect').value;
+            if (input.value.trim()) {
+                if (!shoppingData[section]) shoppingData[section] = [];
+                shoppingData[section].push({ name: input.value.trim(), checked: false });
+                saveData();
+                renderShoppingList();
+                input.value = '';
+            }
+        }
+        
+        function filterSection(section) {
+            currentFilter = section;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderShoppingList();
+        }
+        
+        function toggleItem(section, idx) {
+            shoppingData[section][idx].checked = !shoppingData[section][idx].checked;
+            saveData();
+            renderShoppingList();
+        }
+        
+        function deleteItem(section, idx) {
+            shoppingData[section].splice(idx, 1);
+            saveData();
+            renderShoppingList();
+        }
+        
+        function renderShoppingList() {
+            let html = '';
+            let totalItems = 0;
+            let checkedItems = 0;
+            
+            Object.entries(shoppingData).forEach(([section, items]) => {
+                const filtered = currentFilter === 'all' || currentFilter === section;
+                if (!filtered) return;
+                
+                html += `<div class="shopping-section">
+                    <div class="section-title">${section}</div>`;
+                
+                items.forEach((item, idx) => {
+                    totalItems++;
+                    if (item.checked) checkedItems++;
+                    html += `
+                        <div class="shopping-item ${item.checked ? 'checked' : ''}">
+                            <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleItem('${section}', ${idx})" />
+                            <label>${item.name}</label>
+                            <button class="delete-btn" onclick="deleteItem('${section}', ${idx})">×</button>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            });
+            
+            const percent = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+            document.getElementById('stats').innerHTML = `✓ ${checkedItems} of ${totalItems} items (${percent}%)`;
+            document.getElementById('shoppingList').innerHTML = html || '<div class="empty-state"><p>No items found</p></div>';
+        }
+        
+        function renderMealPlan() {
+            let html = '';
+            Object.entries(mealPlanData).forEach(([day, meals]) => {
+                html += `
+                    <div class="meal-day">
+                        <h3>${day}</h3>
+                        <div class="meal-type"><strong>Breakfast:</strong> <p>${meals.breakfast}</p></div>
+                        <div class="meal-type"><strong>Lunch:</strong> <p>${meals.lunch}</p></div>
+                        <div class="meal-type"><strong>Dinner:</strong> <p>${meals.dinner}</p></div>
+                    </div>
+                `;
+            });
+            document.getElementById('mealPlanContent').innerHTML = html;
+        }
+        
+        function renderRecipes() {
+            let html = '';
+            Object.entries(recipes).forEach(([day, recipe]) => {
+                html += `
+                    <div class="recipe-day">
+                        <h3 onclick="this.nextElementSibling.classList.toggle('open')">
+                            <span>${day}: ${recipe.name}</span>
+                            <span>▼</span>
+                        </h3>
+                        <div class="recipe-content">
+                            <strong>⏱️ Time:</strong> ${recipe.time}<br>
+                            <strong>👥 Servings:</strong> ${recipe.servings}<br>
+                            <strong>🥘 Ingredients:</strong> ${recipe.ingredients}<br><br>
+                            <strong>👨‍🍳 Instructions:</strong><br>${recipe.instructions}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('recipesContent').innerHTML = html;
+        }
+        
+        function renderPrepTips() {
+            const tips = `
+                <div class="prep-tips-section">
+                    <h3>🍳 Sunday Prep (30-45 min)</h3>
+                    <p>• Roast chicken for the week</p>
+                    <p>• Make breakfast bake (2 batches)</p>
+                    <p>• Prep vegetables: chop onions, peppers, carrots</p>
+                    <p>• Cook rice in bulk (3 cups)</p>
+                </div>
+                
+                <div class="prep-tips-section">
+                    <h3>🍲 Batch Cooking Ideas</h3>
+                    <p>• Marinara sauce: make double batch, use Wed + Fri</p>
+                    <p>• Ground beef: brown 2 lbs, use for tacos & pasta</p>
+                    <p>• Slow cooker pulled pork: set Saturday morning</p>
+                    <p>• Rice: cook 3 cups for the week</p>
+                </div>
+                
+                <div class="prep-tips-section">
+                    <h3>⏱️ Quick Night Strategy</h3>
+                    <p>• Blackstone meals = 1 griddle to clean (Mon & Fri)</p>
+                    <p>• Use pre-cut veggies from Sunday prep</p>
+                    <p>• Sheet pan meals = 1 pan to clean</p>
+                    <p>• Get Andrew & Ben involved!</p>
+                </div>
+                
+                <div class="prep-tips-section">
+                    <h3>✅ Wheat-Free Notes</h3>
+                    <p>• GF pasta: Barilla or Banza</p>
+                    <p>• Soy sauce: Use tamari (wheat-free)</p>
+                    <p>• Check labels on marinara sauces</p>
+                    <p>• Rice, corn, potatoes are naturally wheat-free</p>
+                </div>
+            `;
+            document.getElementById('prepContent').innerHTML = tips;
+        }
+        
+        function saveData() {
+            localStorage.setItem('shoppingData', JSON.stringify(shoppingData));
+        }
+        
+        window.onload = function() {
+            renderShoppingList();
+        };
+    </script>
+</body>
+</html>
